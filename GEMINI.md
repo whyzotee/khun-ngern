@@ -43,7 +43,7 @@ To enable automated deployment, ensure the following secrets are configured in y
 
 ### Environment Variables (for Frontend Build)
 - `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
 - `VITE_LIFF_ID`
 
 ## Recent Updates

@@ -2,17 +2,33 @@ import React, { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useLiffStore } from "../store/useLiffStore";
 
+const LIFF_IDS = {
+  ACCOUNT_MANAGEMENT: "2009825183-HTEPDBNd",
+  BILL_CENTER: "2009825183-NIh7DEo0",
+};
+
 const LineGuard = ({ children }: { children: React.ReactNode }) => {
   const isReady = useLiffStore((state) => state.isReady);
   const isInClient = useLiffStore((state) => state.isInClient);
-  const [, setLocation] = useLocation();
+  const isLoggedIn = useLiffStore((state) => state.isLoggedIn);
+  const initLiff = useLiffStore((state) => state.initLiff);
+  const [location, navigate] = useLocation();
+
+  useEffect(() => {
+    const targetLiffId = location.startsWith("/account-management")
+      ? LIFF_IDS.ACCOUNT_MANAGEMENT
+      : LIFF_IDS.BILL_CENTER;
+
+    initLiff(targetLiffId);
+  }, [location, initLiff]);
 
   useEffect(() => {
     const isDebug = import.meta.env.VITE_DEBUG === "true";
-    if (isReady && !isInClient && !isDebug) {
-      setLocation("/error");
+    // Allow if in LINE client OR if logged in (for safety) OR if debug mode
+    if (isReady && !isInClient && !isLoggedIn && !isDebug) {
+      navigate("/error");
     }
-  }, [isReady, isInClient, setLocation]);
+  }, [isReady, isInClient, isLoggedIn, navigate]);
 
   if (!isReady) {
     return (

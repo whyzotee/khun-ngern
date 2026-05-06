@@ -8,37 +8,32 @@ interface LiffState {
   isReady: boolean;
   error: string | null;
   isInClient: boolean;
+  currentLiffId: string | null;
   initLiff: (liffId: string) => Promise<void>;
   setProfile: (profile: any) => void;
   setError: (error: string) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const useLiffStore = create<LiffState>((set, _get) => ({
+export const useLiffStore = create<LiffState>((set, get) => ({
   profile: null,
   isLoggedIn: false,
   isReady: false,
   error: null,
   isInClient: false,
+  currentLiffId: null,
 
   initLiff: async (liffId: string) => {
-    try {
-      // Check if we are running inside LINE or have a LIFF state in URL
-      // liff.init is still needed to use liff.isInClient() reliably, 
-      // but we can check the user agent or URL parameters as a heuristic 
-      // if we want to avoid init entirely outside LINE.
-      // However, the standard way is to init and then check.
+    // Avoid re-initializing if same ID is already ready
+    if (get().isReady && get().currentLiffId === liffId) return;
 
+    try {
+      set({ isReady: false, error: null });
       await liff.init({ liffId });
       const isInClient = liff.isInClient();
-
-      if (!isInClient) {
-        set({ isReady: true, isInClient: false });
-        return;
-      }
-
       const isLoggedIn = liff.isLoggedIn();
-      set({ isReady: true, isInClient: true, isLoggedIn });
+      
+      set({ isReady: true, isInClient, isLoggedIn, currentLiffId: liffId });
 
       if (isLoggedIn) {
         const profile = await liff.getProfile();
@@ -57,10 +52,12 @@ export const useLiffStore = create<LiffState>((set, _get) => ({
         } catch (syncErr) {
           console.error('Failed to sync user:', syncErr);
         }
-      } else {
+      } else if (isInClient) {
+        // Only auto-login if inside LINE
         liff.login();
       }
     } catch (err: any) {
+      console.error('LIFF Init Error:', err);
       set({ error: err.toString(), isReady: true });
     }
   },

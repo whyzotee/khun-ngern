@@ -59,9 +59,9 @@ To enable automated deployment, ensure the following secrets are configured in y
 - Improved navigation consistency by using `wouter`'s `setLocation`.
 - **Backend Implementation:**
   - Created Supabase Edge Functions directory structure.
-  - Implemented `create-bill` Edge Function to handle bill and item persistence.
-  - Implemented `sync-user` Edge Function to synchronize LIFF profile data with the database.
-  - Added shared CORS utility for Edge Functions.
+  - Implemented `create-bill` and `sync-user` Edge Functions.
+  - Added `supabase/config.toml` to disable global JWT verification (`verify_jwt = false`) for manual token management.
+  - Enforced manual `Authorization` header check in all Edge Functions (returns 401 if missing).
 - **CI/CD Automation:**
   - Created `supabase-deploy.yml` for automated Edge Function deployment.
   - Created `netlify-deploy.yml` for automated frontend build and deployment (using Bun).

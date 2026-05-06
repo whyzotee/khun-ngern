@@ -1,0 +1,7 @@
+project_id = "your-project-ref"
+
+[functions.create-bill]
+verify_jwt = false
+
+[functions.sync-user]
+verify_jwt = false

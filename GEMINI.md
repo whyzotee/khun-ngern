@@ -65,3 +65,8 @@ To enable automated deployment, ensure the following secrets are configured in y
 - **CI/CD Automation:**
   - Created `supabase-deploy.yml` for automated Edge Function deployment.
   - Created `netlify-deploy.yml` for automated frontend build and deployment (using Bun).
+- **UI & Persistence Updates:**
+  - Refined `BillCenter.tsx` layout to fix text squeezing issues on mobile screens by optimizing padding and font sizes.
+  - Implemented real database persistence for `AccountManagement.tsx` using Supabase.
+  - Added account fetching and `upsert` logic to sync payment information with the `user_accounts` table.
+  - Integrated `Loader2` for better UX during network operations in Account Management.

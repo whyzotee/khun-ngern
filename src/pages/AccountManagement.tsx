@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -32,14 +32,20 @@ import {
   Plus,
   ChevronRight,
   Wallet,
-  CheckCircle2
+  CheckCircle2,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+import { useLiffStore } from "@/store/useLiffStore";
 
 const AccountManagement = () => {
+  const { profile } = useLiffStore();
   const [view, setView] = useState<"list" | "form">("list");
   const [activeTab, setActiveTab] = useState<"bank" | "promptpay">("bank");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -50,27 +56,107 @@ const AccountManagement = () => {
 
   // Saved Account State
   const [account, setAccount] = useState<{
+    id?: string;
     name: string;
     type: "bank" | "promptpay";
     bankName?: string;
     accountId: string;
   } | null>(null);
 
+  useEffect(() => {
+    if (profile?.userId) {
+      fetchAccount();
+    }
+  }, [profile?.userId]);
+
+  const fetchAccount = async () => {
+    try {
+      setIsFetching(true);
+      const { data, error } = await supabase
+        .from("user_accounts")
+        .select("*")
+        .eq("user_id", profile.userId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data) {
+        setAccount({
+          id: data.id,
+          name: data.name,
+          type: data.account_type as "bank" | "promptpay",
+          bankName: data.bank_name || undefined,
+          accountId: data.account_id
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching account:", err);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   const handleOpenConfirm = () => {
-    // Basic validation could go here
+    if (!formData.name || !formData.accountId) {
+      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
+    if (activeTab === "bank" && !formData.bankName) {
+      alert("กรุณาเลือกธนาคาร");
+      return;
+    }
     setIsConfirmOpen(true);
   };
 
-  const handleConfirmSave = () => {
-    setAccount({
-      name: formData.name,
-      type: activeTab,
-      bankName: activeTab === "bank" ? formData.bankName : undefined,
-      accountId: formData.accountId
-    });
-    setIsConfirmOpen(false);
-    setView("list");
+  const handleConfirmSave = async () => {
+    if (!profile?.userId) return;
+
+    try {
+      setIsLoading(true);
+      const accountData = {
+        user_id: profile.userId,
+        name: formData.name,
+        account_type: activeTab,
+        bank_name: activeTab === "bank" ? formData.bankName : null,
+        account_id: formData.accountId,
+        is_default: true,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase
+        .from("user_accounts")
+        .upsert(accountData, { onConflict: "user_id" })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setAccount({
+          id: data.id,
+          name: data.name,
+          type: data.account_type as "bank" | "promptpay",
+          bankName: data.bank_name || undefined,
+          accountId: data.account_id
+        });
+        setIsConfirmOpen(false);
+        setView("list");
+      }
+    } catch (err) {
+      console.error("Error saving account:", err);
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (isFetching) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
 
   if (view === "list") {
     return (
@@ -343,12 +429,21 @@ const AccountManagement = () => {
           <DialogFooter className="p-6 pt-0 flex flex-col gap-3">
             <Button
               onClick={handleConfirmSave}
+              disabled={isLoading}
               className="w-full h-12 rounded-2xl font-bold text-lg"
             >
-              ยืนยันข้อมูล
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  กำลังบันทึก...
+                </>
+              ) : (
+                "ยืนยันข้อมูล"
+              )}
             </Button>
             <Button
               variant="ghost"
+              disabled={isLoading}
               onClick={() => setIsConfirmOpen(false)}
               className="w-full h-12 rounded-2xl font-medium text-muted-foreground hover:bg-muted/50"
             >

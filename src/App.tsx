@@ -1,6 +1,7 @@
 import { Route, Switch } from "wouter";
 import IndexPage from "@/pages/IndexPage";
 import BillCenter from "@/pages/BillCenter";
+import CreateBill from "@/pages/CreateBill";
 import AccountManagement from "@/pages/AccountManagement";
 import ErrorPage from "@/pages/ErrorPage";
 import LineGuard from "@/components/LineGuard";
@@ -13,10 +14,15 @@ function App() {
         <ErrorPage />
       </Route>
 
-      {/* Main Features */}
       <Route path="/bill-center">
         <LineGuard>
           <BillCenter />
+        </LineGuard>
+      </Route>
+
+      <Route path="/create-bill">
+        <LineGuard>
+          <CreateBill />
         </LineGuard>
       </Route>
 

@@ -43,6 +43,20 @@ export const useLiffStore = create<LiffState>((set, _get) => ({
       if (isLoggedIn) {
         const profile = await liff.getProfile();
         set({ profile });
+        
+        // Sync user with Supabase
+        try {
+          const { supabase } = await import('@/lib/supabase');
+          await supabase.functions.invoke('sync-user', {
+            body: {
+              line_user_id: profile.userId,
+              display_name: profile.displayName,
+              picture_url: profile.pictureUrl
+            }
+          });
+        } catch (syncErr) {
+          console.error('Failed to sync user:', syncErr);
+        }
       } else {
         liff.login();
       }

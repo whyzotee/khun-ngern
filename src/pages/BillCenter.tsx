@@ -8,9 +8,12 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 import { Users, User, ReceiptText } from "lucide-react";
 
 const BillCenter = () => {
+  const [, setLocation] = useLocation();
+
   return (
     <div className="min-h-screen bg-muted/30 pb-20">
       <div className="bg-primary p-6 rounded-b-[2rem] shadow-lg">
@@ -66,7 +69,10 @@ const BillCenter = () => {
                 </div>
               </CardContent>
               <CardFooter className="w-full">
-                <Button className="w-full h-14 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 flex gap-2">
+                <Button 
+                  onClick={() => setLocation("/create-bill")}
+                  className="w-full h-14 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 flex gap-2"
+                >
                   <ReceiptText className="w-5 h-5" />
                   เริ่มสร้างบิล
                 </Button>

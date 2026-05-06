@@ -1,6 +1,17 @@
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 import { Landmark } from "lucide-react";
 
 const IndexPage = () => {
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLocation("/bill-center");
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [setLocation]);
+
   return (
     <div className="flex items-center justify-center h-screen bg-background">
       <div className="flex flex-col items-center animate-in fade-in zoom-in duration-700">

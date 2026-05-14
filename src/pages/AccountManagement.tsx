@@ -53,21 +53,21 @@ const AccountManagement = () => {
 
       try {
         setIsFetching(true);
-        const { data, error } = await supabase
-          .from("user_accounts")
-          .select("*")
-          .eq("user_id", profile.userId)
-          .maybeSingle();
+        const { data, error } = await supabase.functions.invoke("get-account", {
+          body: {
+            user_id: profile.userId
+          }
+        });
 
         if (error) throw error;
-        if (!data) return;
+        if (!data.account) return;
 
         const nextAccount = {
-          id: data.id,
-          name: data.name,
-          type: data.account_type as AccountType,
-          bankName: data.bank_name || undefined,
-          accountId: data.account_id
+          id: data.account.id,
+          name: data.account.name,
+          type: data.account.account_type as AccountType,
+          bankName: data.account.bank_name || undefined,
+          accountId: data.account.account_id
         };
         setAccount(nextAccount);
         setAccountType(nextAccount.type);
@@ -108,25 +108,20 @@ const AccountManagement = () => {
     try {
       setIsSaving(true);
       if (profile?.userId && import.meta.env.VITE_SUPABASE_URL) {
-        const { data, error } = await supabase
-          .from("user_accounts")
-          .upsert(
-            {
-              user_id: profile.userId,
-              name: nextAccount.name,
-              account_type: nextAccount.type,
-              bank_name: nextAccount.bankName || null,
-              account_id: nextAccount.accountId,
-              is_default: true,
-              updated_at: new Date().toISOString()
-            },
-            { onConflict: "user_id" }
-          )
-          .select()
-          .single();
+        const { data, error } = await supabase.functions.invoke("save-account", {
+          body: {
+            user_id: profile.userId,
+            display_name: profile.displayName,
+            picture_url: profile.pictureUrl,
+            name: nextAccount.name,
+            account_type: nextAccount.type,
+            bank_name: nextAccount.bankName || null,
+            account_id: nextAccount.accountId
+          }
+        });
 
         if (error) throw error;
-        nextAccount.id = data.id;
+        nextAccount.id = data.account?.id;
       }
 
       setAccount(nextAccount);

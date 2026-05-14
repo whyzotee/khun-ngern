@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.sync-user]
 verify_jwt = false
+
+[functions.get-account]
+verify_jwt = false
+
+[functions.save-account]
+verify_jwt = false

@@ -11,6 +11,11 @@ interface CreateBillRequest {
   title: string
   total_amount: number
   creator_id: string
+  split_type?: 'equal' | 'each'
+  members?: Array<{
+    line_user_id: string
+    display_name: string
+  }>
   items: BillItem[]
 }
 
@@ -24,9 +29,9 @@ serve(async (req) => {
     // Manual Token Check
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Missing Authorization header' }), { 
-        status: 401, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      return new Response(JSON.stringify({ error: 'Missing Authorization header' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
     }
 
@@ -35,7 +40,19 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
-    const { title, total_amount, creator_id, items }: CreateBillRequest = await req.json()
+    const { title, total_amount, creator_id, members = [], items }: CreateBillRequest = await req.json()
+
+    await supabaseClient
+      .from('users')
+      .upsert(
+        {
+          line_user_id: creator_id,
+          display_name: 'Bill creator',
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'line_user_id', ignoreDuplicates: true }
+      )
+      .throwOnError()
 
     // 1. Insert into bills table
     const { data: bill, error: billError } = await supabaseClient
@@ -63,6 +80,22 @@ serve(async (req) => {
       .insert(itemsToInsert)
 
     if (itemsError) throw itemsError
+
+    if (members.length > 0) {
+      const amountOwed = Math.ceil(total_amount / members.length)
+      const participantsToInsert = members.map(member => ({
+        bill_id: bill.id,
+        user_id: null,
+        display_name: member.display_name,
+        amount_owed: amountOwed,
+      }))
+
+      const { error: participantsError } = await supabaseClient
+        .from('bill_participants')
+        .insert(participantsToInsert)
+
+      if (participantsError) throw participantsError
+    }
 
     return new Response(
       JSON.stringify({ message: 'Bill created successfully', bill_id: bill.id }),

@@ -18,7 +18,7 @@ serve(async (req) => {
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     const { user_id } = await req.json()
@@ -33,6 +33,8 @@ serve(async (req) => {
       .from('user_accounts')
       .select('*')
       .eq('user_id', user_id)
+      .order('updated_at', { ascending: false })
+      .limit(1)
       .maybeSingle()
 
     if (error) throw error

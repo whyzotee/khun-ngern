@@ -53,22 +53,36 @@ serve(async (req) => {
       )
       .throwOnError()
 
-    const { data, error } = await supabaseClient
+    const accountPayload = {
+      user_id: payload.user_id,
+      name: payload.name,
+      account_type: payload.account_type,
+      bank_name: payload.account_type === 'bank' ? payload.bank_name : null,
+      account_id: payload.account_id,
+      is_default: true,
+      updated_at: new Date().toISOString(),
+    }
+
+    const { data: existingAccount, error: existingError } = await supabaseClient
       .from('user_accounts')
-      .upsert(
-        {
-          user_id: payload.user_id,
-          name: payload.name,
-          account_type: payload.account_type,
-          bank_name: payload.account_type === 'bank' ? payload.bank_name : null,
-          account_id: payload.account_id,
-          is_default: true,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' }
-      )
-      .select()
-      .single()
+      .select('id')
+      .eq('user_id', payload.user_id)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (existingError) throw existingError
+
+    const query = existingAccount
+      ? supabaseClient
+          .from('user_accounts')
+          .update(accountPayload)
+          .eq('id', existingAccount.id)
+      : supabaseClient
+          .from('user_accounts')
+          .insert(accountPayload)
+
+    const { data, error } = await query.select().single()
 
     if (error) throw error
 

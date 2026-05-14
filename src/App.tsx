@@ -1,9 +1,9 @@
 import { Route, Switch } from "wouter";
-import IndexPage from "@/pages/IndexPage";
+import AccountManagement from "@/pages/AccountManagement";
 import BillCenter from "@/pages/BillCenter";
 import CreateBill from "@/pages/CreateBill";
-import AccountManagement from "@/pages/AccountManagement";
 import ErrorPage from "@/pages/ErrorPage";
+import IndexPage from "@/pages/IndexPage";
 import LineGuard from "@/components/LineGuard";
 
 function App() {
@@ -33,17 +33,15 @@ function App() {
       </Route>
 
       <Route>
-        <div className="flex flex-col items-center justify-center h-screen p-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-200 mb-2">404</h1>
-          <p className="text-xl font-bold text-gray-800">
-            ไม่พบหน้าที่คุณต้องการ
-          </p>
-          <p className="mt-2 text-gray-500">
-            ขออภัย หน้าที่คุณพยายามเข้าถึงไม่มีอยู่จริง
+        <div className="flex h-screen flex-col items-center justify-center bg-[#f5f7f5] p-8 text-center text-[#15221b]">
+          <h1 className="text-5xl font-black text-[#d9e2dc]">404</h1>
+          <p className="mt-3 text-xl font-black">ไม่พบหน้าที่คุณต้องการ</p>
+          <p className="mt-2 max-w-xs text-sm leading-6 text-[#66736b]">
+            ขออภัย หน้านี้อาจถูกย้ายหรือยังไม่ได้เปิดใช้งาน
           </p>
           <button
             onClick={() => (window.location.href = "/")}
-            className="mt-8 bg-line text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-line/20"
+            className="mt-8 rounded-2xl bg-[#0fb85d] px-7 py-3 font-bold text-white shadow-lg shadow-[#0fb85d]/20"
           >
             กลับหน้าหลัก
           </button>

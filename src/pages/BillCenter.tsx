@@ -1,120 +1,181 @@
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { Users, User, ReceiptText } from "lucide-react";
+import {
+  BellRing,
+  CheckCircle2,
+  CreditCard,
+  ReceiptText,
+  Send,
+  User,
+  Users,
+  Wallet
+} from "lucide-react";
+
+const activeBills = [
+  {
+    title: "ชาบูหลังเลิกงาน",
+    amount: 1840,
+    paid: 3,
+    total: 5,
+    status: "รออีก 2 คน"
+  },
+  {
+    title: "ค่าของกินทริปบางแสน",
+    amount: 3260,
+    paid: 6,
+    total: 6,
+    status: "ครบแล้ว"
+  }
+];
 
 const BillCenter = () => {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-20">
-      <div className="bg-primary p-6 rounded-b-[2rem] shadow-lg">
-        <h1 className="text-primary-foreground text-2xl font-bold tracking-tight">
-          สร้างบิล
-        </h1>
-        <p className="text-primary-foreground/80 text-sm mt-1">
-          ส่งบิลเรียกเก็บเงินไปยังแชทของคุณ
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#f5f7f5] pb-24 text-[#15221b]">
+      <header className="bg-[#10251a] px-5 pb-9 pt-6 text-white">
+        <div className="mx-auto max-w-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-[#8ee6b5]">Khun Ngern</p>
+              <h1 className="mt-1 text-2xl font-black tracking-tight">
+                ศูนย์เรียกเก็บเงิน
+              </h1>
+            </div>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-11 w-11 rounded-2xl bg-white/10 text-white hover:bg-white/15"
+              onClick={() => setLocation("/account-management")}
+              aria-label="จัดการบัญชีรับเงิน"
+            >
+              <Wallet className="h-5 w-5" />
+            </Button>
+          </div>
 
-      <div className="px-4 -mt-6">
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            <div className="rounded-2xl bg-white/10 p-3">
+              <p className="text-xs text-white/65">บิลเปิดอยู่</p>
+              <p className="mt-1 text-xl font-black">2</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-3">
+              <p className="text-xs text-white/65">รับแล้ว</p>
+              <p className="mt-1 text-xl font-black">฿4,920</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-3">
+              <p className="text-xs text-white/65">รอจ่าย</p>
+              <p className="mt-1 text-xl font-black">2 คน</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto -mt-5 max-w-md px-4">
         <Tabs defaultValue="group" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 h-14 p-1 rounded-2xl shadow-sm bg-background">
+          <TabsList className="grid h-13 w-full grid-cols-2 rounded-2xl bg-white p-1 shadow-sm">
             <TabsTrigger
               value="group"
-              className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex gap-1.5 h-full"
+              className="h-full rounded-xl data-[state=active]:bg-[#0fb85d] data-[state=active]:text-white"
             >
-              <Users className="w-4 h-4" />
+              <Users className="mr-2 h-4 w-4" />
               กรุ๊ปไลน์
             </TabsTrigger>
             <TabsTrigger
               value="private"
-              className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex gap-1.5 h-full"
+              className="h-full rounded-xl data-[state=active]:bg-[#0fb85d] data-[state=active]:text-white"
             >
-              <User className="w-4 h-4" />
+              <User className="mr-2 h-4 w-4" />
               แชทส่วนตัว
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="group" className="mt-6">
-            <Card className="border-none shadow-sm rounded-3xl overflow-hidden px-4 py-6 flex flex-col items-center text-center">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                <Users className="w-10 h-10 text-primary" />
-              </div>
-              <CardHeader className="pt-0 px-0">
-                <CardTitle className="text-xl">เรียกเก็บเงินในกรุ๊ป</CardTitle>
-                <CardDescription className="text-sm leading-relaxed">
-                  สร้างบิลสำหรับหารค่าใช้จ่ายในกลุ่มเพื่อนที่กำลังคุยอยู่
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="w-full px-0">
-                <div className="bg-muted/50 rounded-2xl p-4 text-left mb-6 flex gap-3 items-center">
-                  <div className="bg-primary/20 p-2 rounded-lg">
-                    <ReceiptText className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">แชร์บิลเข้ากลุ่ม</p>
-                    <p className="text-xs text-muted-foreground">
-                      เพื่อนทุกคนในกลุ่มจะเห็นบิลนี้
-                    </p>
-                  </div>
+          <TabsContent value="group" className="mt-4 space-y-4">
+            <section className="rounded-[22px] bg-white p-4 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e8f8ef] text-[#0b7f45]">
+                  <ReceiptText className="h-6 w-6" />
                 </div>
-              </CardContent>
-              <CardFooter className="w-full p-0">
-                <Button 
-                  onClick={() => setLocation("/create-bill")}
-                  className="w-full h-14 rounded-2xl font-bold text-lg shadow-lg shadow-primary/20 flex gap-2"
-                >
-                  <ReceiptText className="w-5 h-5" />
-                  เริ่มสร้างบิล
-                </Button>
-              </CardFooter>
-            </Card>
+                <div className="flex-1">
+                  <h2 className="text-lg font-black">สร้างบิลเข้ากลุ่ม</h2>
+                  <p className="mt-1 text-sm leading-6 text-[#66736b]">
+                    ใส่รายการ เลือกคนหาร แล้วเตรียมข้อความสำหรับส่งเข้า LINE
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => setLocation("/create-bill")}
+                className="mt-5 h-13 w-full rounded-2xl bg-[#0fb85d] text-base font-bold text-white shadow-lg shadow-[#0fb85d]/20 hover:bg-[#0b9f50]"
+              >
+                <Send className="mr-2 h-5 w-5" />
+                เริ่มสร้างบิล
+              </Button>
+            </section>
+
+            <section className="space-y-3">
+              <div className="flex items-center justify-between px-1">
+                <h2 className="font-black">บิลล่าสุด</h2>
+                <Badge className="rounded-xl bg-[#eef4f0] text-[#526158] hover:bg-[#eef4f0]">
+                  Demo
+                </Badge>
+              </div>
+              {activeBills.map((bill) => {
+                const isDone = bill.paid === bill.total;
+                return (
+                  <article
+                    key={bill.title}
+                    className="rounded-[22px] bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-bold">{bill.title}</p>
+                        <p className="mt-1 text-sm text-[#66736b]">
+                          ฿{bill.amount.toLocaleString()} · จ่ายแล้ว {bill.paid}/{bill.total}
+                        </p>
+                      </div>
+                      <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-2xl ${
+                          isDone ? "bg-[#e9f8f1] text-[#0b7f45]" : "bg-[#fff7e4] text-[#a46b00]"
+                        }`}
+                      >
+                        {isDone ? <CheckCircle2 className="h-5 w-5" /> : <BellRing className="h-5 w-5" />}
+                      </div>
+                    </div>
+                    <div className="mt-3 h-2 rounded-full bg-[#edf1ee]">
+                      <div
+                        className="h-2 rounded-full bg-[#0fb85d]"
+                        style={{ width: `${(bill.paid / bill.total) * 100}%` }}
+                      />
+                    </div>
+                    <p className="mt-3 text-xs font-semibold text-[#526158]">
+                      {bill.status}
+                    </p>
+                  </article>
+                );
+              })}
+            </section>
           </TabsContent>
 
-          <TabsContent value="private" className="mt-6">
-            <Card className="border-none shadow-sm rounded-3xl overflow-hidden px-4 py-6 flex flex-col items-center text-center">
-              <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mb-6">
-                <User className="w-10 h-10 text-blue-500" />
+          <TabsContent value="private" className="mt-4">
+            <section className="rounded-[22px] bg-white p-5 text-center shadow-sm">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#eaf4ff] text-[#1673d1]">
+                <CreditCard className="h-8 w-8" />
               </div>
-              <CardHeader className="pt-0 px-0">
-                <CardTitle className="text-xl">เรียกเก็บเงินรายบุคคล</CardTitle>
-                <CardDescription className="text-sm leading-relaxed">
-                  ส่งบิลให้เพื่อนโดยตรงผ่านแชทส่วนตัวแบบ 1:1
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="w-full px-0">
-                <div className="bg-blue-50/50 rounded-2xl p-4 text-left mb-6 flex gap-3 items-center border border-blue-100">
-                  <div className="bg-blue-500/20 p-2 rounded-lg">
-                    <User className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-blue-700">
-                      ส่งตรงถึงเพื่อน
-                    </p>
-                    <p className="text-xs text-blue-500">
-                      เลือกเพื่อนจากรายการแชทของคุณ
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="w-full p-0">
-                <Button className="w-full h-14 rounded-2xl font-bold text-lg shadow-lg shadow-blue-500/20 bg-blue-500 hover:bg-blue-600 flex gap-2 border-none">
-                  เลือกเพื่อนที่ต้องการส่งบิล
-                </Button>
-              </CardFooter>
-            </Card>
+              <h2 className="mt-4 text-lg font-black">ส่งบิลรายคน</h2>
+              <p className="mt-2 text-sm leading-6 text-[#66736b]">
+                โหมดนี้เตรียมไว้สำหรับเลือกเพื่อน 1:1 จาก LINE แล้วส่งลิงก์จ่ายเงินโดยตรง
+              </p>
+              <Button
+                className="mt-5 h-12 w-full rounded-2xl bg-[#1673d1] font-bold text-white hover:bg-[#1264b7]"
+                disabled
+              >
+                กำลังเตรียม Integration
+              </Button>
+            </section>
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
     </div>
   );
 };

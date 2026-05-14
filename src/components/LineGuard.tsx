@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useLocation } from "wouter";
-import { useLiffStore } from "../store/useLiffStore";
+import { useLiffStore } from "@/store/useLiffStore";
 
 const LIFF_IDS = {
   ACCOUNT_MANAGEMENT: "2009825183-HTEPDBNd",
-  BILL_CENTER: "2009825183-NIh7DEo0",
+  BILL_CENTER: "2009825183-NIh7DEo0"
 };
 
-const LineGuard = ({ children }: { children: React.ReactNode }) => {
+const LineGuard = ({ children }: { children: ReactNode }) => {
   const isReady = useLiffStore((state) => state.isReady);
   const isInClient = useLiffStore((state) => state.isInClient);
   const isLoggedIn = useLiffStore((state) => state.isLoggedIn);
@@ -24,7 +24,6 @@ const LineGuard = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const isDebug = import.meta.env.VITE_DEBUG === "true";
-    // Allow if in LINE client OR if logged in (for safety) OR if debug mode
     if (isReady && !isInClient && !isLoggedIn && !isDebug) {
       navigate("/error");
     }
@@ -32,10 +31,10 @@ const LineGuard = ({ children }: { children: React.ReactNode }) => {
 
   if (!isReady) {
     return (
-      <div className="flex items-center justify-center h-screen bg-white">
+      <div className="flex h-screen items-center justify-center bg-[#f5f7f5]">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-line mb-4"></div>
-          <p className="text-gray-500 font-medium">กำลังโหลด...</p>
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-[#0fb85d]" />
+          <p className="font-medium text-[#66736b]">กำลังโหลด...</p>
         </div>
       </div>
     );
